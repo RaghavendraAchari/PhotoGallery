@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Fetcher {
-
+    public static int page = 1;
     private static final String TAG = "Fetcher";
     private static final String API_KEY = "99c6999aec594bddaf5a2d92caeba6d9";
 
@@ -61,6 +61,7 @@ public class Fetcher {
                     .appendQueryParameter("format", "json")
                     .appendQueryParameter("nojsoncallback", "1")
                     .appendQueryParameter("extras", "url_s")
+                    .appendQueryParameter("page",Integer.valueOf(page).toString())
                     .build().toString();
 
             String jasonString = getUrlString(url);
