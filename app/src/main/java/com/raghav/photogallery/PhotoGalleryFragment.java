@@ -23,9 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PhotoGalleryFragment extends Fragment{
+    private static final String TAG = "PhotoGallery Fragment";
+
     private RecyclerView mPhotoRecyclerView;
     private List<GalleryItem> mItemsList = new ArrayList<>();
-
+    private ThumbnailDownloader<PhotoHolder> mThumbnailDownloader;
 
     private class FetchItemTask extends AsyncTask<Void,Void,List<GalleryItem>>{
         private static final String TAG = "PhotoGalleryFragment";
@@ -76,6 +78,7 @@ public class PhotoGalleryFragment extends Fragment{
             GalleryItem galleryItem = mGalleryItemsList.get(i);
             Drawable drawable = getResources().getDrawable(R.drawable.ic_launcher_foreground);
             photoHolder.bindDrawable(drawable);
+            mThumbnailDownloader.queueThumbnail(photoHolder,galleryItem.getUrl());
         }
 
         @Override
@@ -93,6 +96,11 @@ public class PhotoGalleryFragment extends Fragment{
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         new FetchItemTask().execute();
+
+        mThumbnailDownloader = new ThumbnailDownloader<>();
+        mThumbnailDownloader.start();
+        mThumbnailDownloader.getLooper();
+        Log.i(TAG, "Background Thread Started");
     }
 
     @Nullable
@@ -129,5 +137,13 @@ public class PhotoGalleryFragment extends Fragment{
         if(isAdded()){
             mPhotoRecyclerView.setAdapter(new photoAdapter(mItemsList));
         }
+    }
+
+    @Override
+    public void onDestroy() {
+
+        super.onDestroy();
+        mThumbnailDownloader.quit();
+        Log.i(TAG,"Background Thread Destroyed");
     }
 }

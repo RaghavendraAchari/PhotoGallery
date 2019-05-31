@@ -8,9 +8,6 @@
     android:id="@+id/item_image_view"
     android:layout_gravity="center"
     android:scaleType="centerCrop"
-
-
-
     >
 
 </ImageView>
