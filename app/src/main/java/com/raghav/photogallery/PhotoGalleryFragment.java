@@ -36,7 +36,12 @@ public class PhotoGalleryFragment extends Fragment{
         private static final String TAG = "PhotoGalleryFragment";
         @Override
         protected List<GalleryItem> doInBackground(Void... voids) {
-            return new Fetcher().fetchItems();
+            String query = "nature";
+            if(query == null){
+                return new Fetcher().fetchRecentPhotos();
+            }else {
+                return new Fetcher().searchPhotos(query);
+            }
         }
 
         @Override
