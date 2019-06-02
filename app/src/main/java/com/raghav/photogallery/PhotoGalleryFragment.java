@@ -11,8 +11,12 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,9 +38,20 @@ public class PhotoGalleryFragment extends Fragment{
 
     private class FetchItemTask extends AsyncTask<Void,Void,List<GalleryItem>>{
         private static final String TAG = "PhotoGalleryFragment";
+        private String mQuery ;
+
+        public FetchItemTask(String query) {
+            this.mQuery = query;
+        }
+
         @Override
         protected List<GalleryItem> doInBackground(Void... voids) {
-            return new Fetcher().fetchItems();
+
+            if(mQuery == null){
+                return new Fetcher().fetchRecentPhotos();
+            }else {
+                return new Fetcher().searchPhotos(mQuery);
+            }
         }
 
         @Override
@@ -98,7 +113,8 @@ public class PhotoGalleryFragment extends Fragment{
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        new FetchItemTask().execute();
+        setHasOptionsMenu(true);
+        updateItems();
 
         Handler responseHandler = new Handler();
 
@@ -136,8 +152,7 @@ public class PhotoGalleryFragment extends Fragment{
                 if(!recyclerView.canScrollVertically(1)){
                     Toast.makeText(getActivity(),"Last",Toast.LENGTH_SHORT).show();
                     Fetcher.page++;
-                    List<GalleryItem> newList = new ArrayList<>();
-                    new FetchItemTask().execute();
+                    updateItems();
                 }
             }
 
@@ -156,6 +171,46 @@ public class PhotoGalleryFragment extends Fragment{
         if(isAdded()){
             mPhotoRecyclerView.setAdapter(new photoAdapter(mItemsList));
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.fragment_photo_gallery, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.menu_item_search);
+        final SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                Log.d(TAG, "Query Text Submit : "+s);
+                QueryPreferences.setStoredQuery(getActivity(),s);
+                updateItems();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                Log.d(TAG, "QueryTextChange: "+s);
+                return false;
+            }
+        });
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.menu_item_clear :
+                QueryPreferences.setStoredQuery(getActivity(),null);
+                updateItems();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void updateItems() {
+        String query = QueryPreferences.getStoredQuery(getActivity());
+        new FetchItemTask(query).execute();
     }
 
     @Override
