@@ -19,8 +19,8 @@ public class Fetcher {
     public static int page = 1;
     private static final String TAG = "Fetcher";
     private static final String API_KEY = "99c6999aec594bddaf5a2d92caeba6d9";
-    private static final String FETCH_RECENT_METHOD = "flicker.photos.getRecent";
-    private static final String SEARCH_METHOD = "flicker.photos.search";
+    private static final String FETCH_RECENT_METHOD = "flickr.photos.getRecent";
+    private static final String SEARCH_METHOD = "flickr.photos.search";
     private static final Uri ENDPOINT = Uri
             .parse("https://api.flickr.com/services/rest/")
             .buildUpon()
