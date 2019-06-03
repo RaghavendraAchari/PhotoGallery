@@ -62,8 +62,6 @@ public class PhotoGalleryFragment extends Fragment{
     }
 
     private class PhotoHolder extends RecyclerView.ViewHolder{
-
-
         private ImageView mImageItem;
 
         public PhotoHolder(@NonNull View itemView) {
@@ -193,6 +191,13 @@ public class PhotoGalleryFragment extends Fragment{
             public boolean onQueryTextChange(String s) {
                 Log.d(TAG, "QueryTextChange: "+s);
                 return false;
+            }
+        });
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String query = QueryPreferences.getStoredQuery(getActivity());
+                searchView.setQuery(query, false);
             }
         });
     }
