@@ -1,5 +1,6 @@
 package com.raghav.photogallery;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -113,6 +114,9 @@ public class PhotoGalleryFragment extends Fragment{
         setRetainInstance(true);
         setHasOptionsMenu(true);
         updateItems();
+
+        Intent intent = PollService.newIntent(getActivity());
+        getActivity().startService(intent);
 
         Handler responseHandler = new Handler();
 
